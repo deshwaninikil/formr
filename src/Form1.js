@@ -23,6 +23,50 @@ function App() {
       }
     }
   }
+
+  const dataObject =(values)=>{
+    let evntlabel = window.location.href;
+    let platform = "";        
+    if (window.innerWidth < 960) {
+      platform = "Mobile";
+    } else {
+      platform = "Desktop";
+    }
+
+    let dataInput = {},userData = {},
+      sendMail = {};
+    dataInput["name"] = `${values.firstName}  ${values.lastName}`;
+    dataInput["email"] = values.emailId;
+    dataInput["mobile"] = values.phoneNumber;
+    dataInput.input = {};
+
+    //not using loop
+    userData = values
+    // userData["business"] = values.business;
+    // userData["firstname"] = values.firstName;
+    // userData["lastname"] = values.lastName;
+    // userData["phoneNumber"] = values.phoneNumber;
+    // userData["organisation"] = values.organisation;
+    // userData["role"] = values.role;
+    userData["agreeToshare"] = false;
+    userData["utm_source"] = getUrlParameter("utm_source")
+      ? getUrlParameter("utm_source")
+      : "NA";
+    userData["utm_medium"] = getUrlParameter("utm_medium")
+      ? getUrlParameter("utm_medium")
+      : "NA";
+    userData["utm_campaign"] = getUrlParameter("utm_campaign")
+      ? getUrlParameter("utm_campaign")
+      : "NA";
+    userData["source"] = platform;
+    userData["sourceurl"] = evntlabel;
+
+    sendMail["trigger"] = true;
+
+    dataInput.input.userData = userData;
+    dataInput.input.sendMail = sendMail;
+    return dataInput;
+  }
   const { values, errors, touched, handleBlur, handleChange, handleSubmit } =
     useFormik({
       initialValues,
@@ -33,50 +77,10 @@ function App() {
           values
         );
         let serviceUrl = `https://etstgusers.economictimes.indiatimes.com/centralized-data-api/form/register`;
-        let evntlabel = window.location.href;
-        let platform = "";        
-        if (window.innerWidth < 960) {
-          platform = "Mobile";
-        } else {
-          platform = "Desktop";
-        }
-
-        let dataInput = {},userData = {},
-          sendMail = {};
-        dataInput["name"] = `${values.firstName}  ${values.lastName}`;
-        dataInput["email"] = values.emailId;
-        dataInput["mobile"] = values.phoneNumber;
-        dataInput.input = {};
-
-        //not using loop
-        userData["business"] = values.business;
-        userData["firstname"] = values.firstName;
-        userData["lastname"] = values.lastName;
-        userData["phoneNumber"] = values.phoneNumber;
-        userData["organisation"] = values.organisation;
-        userData["role"] = values.role;
-        userData["agreeToshare"] = false;
-        userData["utm_source"] = getUrlParameter("utm_source")
-          ? getUrlParameter("utm_source")
-          : "NA";
-        userData["utm_medium"] = getUrlParameter("utm_medium")
-          ? getUrlParameter("utm_medium")
-          : "NA";
-        userData["utm_campaign"] = getUrlParameter("utm_campaign")
-          ? getUrlParameter("utm_campaign")
-          : "NA";
-        userData["source"] = platform;
-        userData["sourceurl"] = evntlabel;
-
-        sendMail["trigger"] = true;
-
-        dataInput.input.userData = userData;
-        dataInput.input.sendMail = sendMail;
-
+        const dataInput=dataObject(values)
         try {
-          const data = await axios.post(serviceUrl, {
-            headers: { clientId: `6360c804dd15e88936219925` },
-            data: dataInput,
+          const data = await axios.post(serviceUrl,dataInput, {
+            headers: { clientId: `6360c804dd15e88936219925` }            
           });
           console.log(data);
         } catch (error) {
